@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Booksky - Personal Book Library</title>
+  
+  <!-- Correct Google Fonts link -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background-color: #121214;
+      color: #ffffff;
+      min-height: 100vh;
+      position: relative;
+      padding-bottom: 90px;
+    }
+
+    /* Navbar */
+    .navbar {
+      background-color: #FD6569;
+      padding: 16px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(253, 101, 105, 0.3);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .navbar h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+    }
+
+    .navbar .stats {
+      background: rgba(0, 0, 0, 0.25);
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    /* Main Container for Books (Responsive Flexbox Grid) */
+    .container {
+      padding: 30px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 25px;
+      align-items: stretch;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    /* Book Card */
+    .book-container {
+      background-color: #1e1e24;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-left: 5px solid #FD6569;
+      padding: 24px;
+      flex: 1 1 320px;
+      max-width: 420px;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .book-container:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+    }
+
+    .book-container h2 {
+      color: #FD6569;
+      font-size: 20px;
+      margin-bottom: 6px;
+      word-break: break-word;
+    }
+
+    .book-container h5 {
+      color: #a0a0ab;
+      font-size: 14px;
+      margin-bottom: 14px;
+      font-weight: 500;
+    }
+
+    .book-container p {
+      color: #d1d1d6;
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 20px;
+      word-break: break-word;
+      flex-grow: 1;
+    }
+
+    .book-container button {
+      align-self: flex-start;
+      background-color: #ef4444;
+      color: white;
+      border-radius: 8px;
+      padding: 8px 18px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: background 0.2s ease;
+    }
+
+    .book-container button:hover {
+      background-color: #dc2626;
+    }
+
+    /* Floating Add Button (+) */
+    .add-button {
+      background-color: #FD6569;
+      color: #ffffff;
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+      font-size: 36px;
+      line-height: 60px;
+      text-align: center;
+      border: none;
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(253, 101, 105, 0.5);
+      z-index: 50;
+      transition: transform 0.2s ease, background-color 0.2s ease;
+    }
+
+    .add-button:hover {
+      transform: scale(1.1);
+      background-color: #e85357;
+    }
+
+    /* Popup Overlay */
+    .popup-overlay {
+      background-color: rgba(0, 0, 0, 0.75);
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      z-index: 100;
+      display: none;
+      backdrop-filter: blur(4px);
+    }
+
+    /* Centered Popup Box */
+    .popup-box {
+      background-color: #FD6569;
+      color: #121214;
+      width: 90%;
+      max-width: 440px;
+      padding: 30px;
+      border-radius: 14px;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 101;
+      display: none;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    }
+
+    .popup-box h2 {
+      margin-bottom: 18px;
+      color: #121214;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .popup-box input,
+    .popup-box textarea {
+      background: #ffffff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      width: 100%;
+      margin-bottom: 14px;
+      padding: 12px;
+      font-size: 14px;
+      color: #121214;
+      outline: none;
+    }
+
+    .popup-box textarea {
+      height: 90px;
+      resize: vertical;
+    }
+
+    .popup-box input:focus,
+    .popup-box textarea:focus {
+      border: 2px solid #121214;
+    }
+
+    .popup-box .btn-group {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .popup-box button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 700;
+      font-size: 14px;
+      transition: opacity 0.2s ease;
+    }
+
+    .popup-box #add-book {
+      background-color: #121214;
+      color: #ffffff;
+    }
+
+    .popup-box #cancel-popup {
+      background-color: rgba(0, 0, 0, 0.15);
+      color: #121214;
+    }
+
+    .popup-box button:hover {
+      opacity: 0.85;
+    }
+
+    /* Empty state message */
+    .empty-msg {
+      width: 100%;
+      text-align: center;
+      padding: 50px 20px;
+      color: #71717a;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <div class="navbar">
+    <h1>Booksky</h1>
+    <div class="stats" id="book-count">0 Books</div>
+  </div>
+
+  <!-- Book Cards Container -->
+  <div class="container" id="books-container">
+    <!-- Books are dynamically rendered here -->
+  </div>
+
+  <!-- Popup Overlay -->
+  <div class="popup-overlay" id="popup-overlay"></div>
+
+  <!-- Popup Modal Box -->
+  <div class="popup-box" id="popup-box">
+    <h2>Add New Book</h2>
+    <form id="book-form">
+      <input type="text" placeholder="Book Title" id="book-title-input" autocomplete="off" required>
+      <input type="text" placeholder="Book Author" id="book-author-input" autocomplete="off" required>
+      <textarea placeholder="Short Description..." id="book-description-input" required></textarea>
+      
+      <div class="btn-group">
+        <button type="button" id="cancel-popup">CANCEL</button>
+        <button type="button" id="add-book">ADD</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- Floating Add Button -->
+  <button class="add-button" id="add-popup-button" title="Add Book">+</button>
+
+  <script>
+    // 1. Select elements
+    var popupoverlay = document.getElementById("popup-overlay");
+    var popupbox = document.getElementById("popup-box");
+    var addpopupbutton = document.getElementById("add-popup-button");
+    var cancelpopup = document.getElementById("cancel-popup");
+    var addbook = document.getElementById("add-book");
+    var container = document.getElementById("books-container");
+    var bookCount = document.getElementById("book-count");
+
+    var booktitleinput = document.getElementById("book-title-input");
+    var bookauthorinput = document.getElementById("book-author-input");
+    var bookdescriptioninput = document.getElementById("book-description-input");
+
+    // Default books list
+    var booksList = [
+      {
+        id: 1,
+        title: "Rich Dad Poor Dad",
+        author: "Robert Kiyosaki",
+        desc: "Rich Dad Poor Dad is a 1997 book advocating financial literacy, independence, and building wealth through investing in assets."
+      }
+    ];
+
+    // Load from localStorage if available
+    var savedBooks = localStorage.getItem("booksky_data");
+    if (savedBooks) {
+      try {
+        booksList = JSON.parse(savedBooks);
+      } catch (e) {
+        console.error("Error reading saved books", e);
+      }
+    }
+
+    // Function to render all books
+    function renderBooks() {
+      container.innerHTML = "";
+
+      if (booksList.length === 0) {
+        container.innerHTML = "<div class='empty-msg'>No books found. Click the '+' button at the bottom-right to add your first book!</div>";
+        bookCount.textContent = "0 Books";
+        return;
+      }
+
+      bookCount.textContent = booksList.length + (booksList.length === 1 ? " Book" : " Books");
+
+      for (var i = 0; i < booksList.length; i++) {
+        var book = booksList[i];
+        var div = document.createElement("div");
+        div.setAttribute("class", "book-container");
+        div.innerHTML = `
+          <h2>${escapeHtml(book.title)}</h2>
+          <h5>By ${escapeHtml(book.author)}</h5>
+          <p>${escapeHtml(book.desc)}</p>
+          <button onclick="deletebook(${book.id})">Delete</button>
+        `;
+        container.appendChild(div);
+      }
+    }
+
+    // Function to escape HTML to prevent layout breakage or XSS
+    function escapeHtml(str) {
+      if (!str) return "";
+      return str
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Save books to localStorage
+    function saveBooks() {
+      localStorage.setItem("booksky_data", JSON.stringify(booksList));
+    }
+
+    // 2. Open popup
+    addpopupbutton.addEventListener("click", function() {
+      popupoverlay.style.display = "block";
+      popupbox.style.display = "block";
+      booktitleinput.focus();
+    });
+
+    // 3. Close popup function
+    function closePopup() {
+      popupoverlay.style.display = "none";
+      popupbox.style.display = "none";
+      booktitleinput.value = "";
+      bookauthorinput.value = "";
+      bookdescriptioninput.value = "";
+    }
+
+    // Cancel button click
+    cancelpopup.addEventListener("click", closePopup);
+
+    // Clicking overlay closes popup
+    popupoverlay.addEventListener("click", closePopup);
+
+    // Pressing 'Escape' closes popup
+    document.addEventListener("keydown", function(event) {
+      if (event.key === "Escape") {
+        closePopup();
+      }
+    });
+
+    // 4. Add book button click
+    addbook.addEventListener("click", function(event) {
+      var title = booktitleinput.value.trim();
+      var author = bookauthorinput.value.trim();
+      var desc = bookdescriptioninput.value.trim();
+
+      if (title === "" || author === "") {
+        alert("Please enter both the Book Title and Author!");
+        return;
+      }
+
+      // Add new book to list
+      var newBook = {
+        id: Date.now(),
+        title: title,
+        author: author,
+        desc: desc || "No description provided."
+      };
+
+      booksList.push(newBook);
+      saveBooks();
+      renderBooks();
+      closePopup();
+    });
+
+    // 5. Delete book function
+    function deletebook(id) {
+      booksList = booksList.filter(function(b) {
+        return b.id !== id;
+      });
+      saveBooks();
+      renderBooks();
+    }
+
+    // Initial render
+    renderBooks();
+  </script>
+
+</body>
+</html>
